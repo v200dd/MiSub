@@ -82,7 +82,7 @@ function updateSsrRemarks(link, updater) {
             ? base64UrlSafeDecodeUtf8(params.get('remarks'))
             : '';
         const newRemarks = updater(oldRemarks);
-        if (!newRemarks || newRemarks === oldRemarks)
+        if (typeof newRemarks !== 'string' || newRemarks === oldRemarks)
             return `ssr://${base64UrlSafeEncodeUtf8(decoded)}`;
         params.set('remarks', base64UrlSafeEncodeUtf8(newRemarks));
         return `ssr://${base64UrlSafeEncodeUtf8(mainPart + params.toString())}`;
@@ -92,7 +92,7 @@ function updateSsrRemarks(link, updater) {
 }
 
 export function setSsrNodeName(link, name) {
-    return name ? updateSsrRemarks(link, () => name) : link;
+    return typeof name === 'string' ? updateSsrRemarks(link, () => name) : link;
 }
 
 /**

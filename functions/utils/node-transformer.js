@@ -335,7 +335,7 @@ function isUselessNode(record) {
  * 支持 VMess (JSON-Base64)、VLESS/Trojan/SS (Fragment)
  */
 export function setNodeName(url, protocol, newName) {
-    if (!url || !newName) return url;
+    if (!url || typeof newName !== 'string') return url;
     const proto = String(protocol || '').toLowerCase();
 
     try {

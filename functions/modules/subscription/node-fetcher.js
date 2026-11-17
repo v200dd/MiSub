@@ -71,7 +71,11 @@ export async function fetchSubscriptionNodes(
                 subscriptionName,
                 url,
                 success: true,
-                nodes: applySubscriptionNodeRenames(parsedNodes, subscription.nodeRenames),
+                nodes: applySubscriptionNodeRenames(
+                    parsedNodes,
+                    subscription.nodeRenames,
+                    subscription.nodeNameReplacements
+                ),
                 error: upstreamError,
                 fromCache: true,
                 cacheUpdatedAt: cached.updatedAt || null,
@@ -171,7 +175,11 @@ export async function fetchSubscriptionNodes(
             subscriptionName,
             url,
             success: true,
-            nodes: applySubscriptionNodeRenames(parsedNodes, subscription?.nodeRenames),
+            nodes: applySubscriptionNodeRenames(
+                parsedNodes,
+                subscription?.nodeRenames,
+                subscription?.nodeNameReplacements
+            ),
             error: null,
         };
     } catch (e) {

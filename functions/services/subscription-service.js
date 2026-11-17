@@ -766,7 +766,11 @@ export async function generateCombinedNodeList(
         const readCachedNodes = async () => {
             if (!cacheEnabled) return [];
             const cached = await readSubscriptionNodeCache(storage, sub);
-            return applySubscriptionNodeRenames(cached?.nodes || [], sub.nodeRenames);
+            return applySubscriptionNodeRenames(
+                cached?.nodes || [],
+                sub.nodeRenames,
+                sub.nodeNameReplacements
+            );
         };
         const readCacheEntry = async () => {
             if (!cacheEnabled) return null;
@@ -873,9 +877,11 @@ export async function generateCombinedNodeList(
                 // 过滤条件变化后命中 0 节点是配置的预期结果，不能回退旧配置的缓存节点
                 const cached = await readCacheEntry();
                 if (!hasFilterConfigChanged(cached))
-                    return applySubscriptionNodeRenames(cached?.nodes || [], sub.nodeRenames).join(
-                        '\n'
-                    );
+                    return applySubscriptionNodeRenames(
+                        cached?.nodes || [],
+                        sub.nodeRenames,
+                        sub.nodeNameReplacements
+                    ).join('\n');
             } else if (cacheEnabled) {
                 const cached = await readCacheEntry();
                 if (
@@ -885,7 +891,11 @@ export async function generateCombinedNodeList(
                     console.warn(
                         `[SubscriptionCache] Refusing suspicious node-count drop for ${sub.id || sub.url} (${cached.nodes.length} -> ${realNodes.length})`
                     );
-                    return applySubscriptionNodeRenames(cached.nodes, sub.nodeRenames).join('\n');
+                    return applySubscriptionNodeRenames(
+                        cached.nodes,
+                        sub.nodeRenames,
+                        sub.nodeNameReplacements
+                    ).join('\n');
                 }
             }
             if (!cacheEnabled && realNodes.length === 0) {
@@ -917,7 +927,11 @@ export async function generateCombinedNodeList(
 
             // 判断是否启用订阅前缀（智能重命名启用时跳过）
             // Keep protective caches before aliases so edits/removals also work during outages.
-            validNodes = applySubscriptionNodeRenames(validNodes, sub.nodeRenames);
+            validNodes = applySubscriptionNodeRenames(
+                validNodes,
+                sub.nodeRenames,
+                sub.nodeNameReplacements
+            );
             const shouldPrependSubscriptions = profilePrefixSettings?.enableSubscriptions ?? true;
             const shouldAddSubPrefix = shouldPrependSubscriptions && !skipPrefixDueToRenaming;
 

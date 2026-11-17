@@ -8,6 +8,7 @@
     import RuleSection from './SubscriptionEditModal/RuleSection.vue';
     import AdvancedOptions from './SubscriptionEditModal/AdvancedOptions.vue';
     import NodeRenameSection from './SubscriptionEditModal/NodeRenameSection.vue';
+    import TextReplaceSection from './SubscriptionEditModal/TextReplaceSection.vue';
     const props = defineProps({
         show: Boolean,
         isNew: Boolean,
@@ -453,6 +454,8 @@
         <template #body>
             <div class="space-y-4">
                 <EditForm :editing-subscription="editingSubscription" />
+
+                <TextReplaceSection :editing-subscription="editingSubscription" :active="show" />
 
                 <NodeRenameSection :editing-subscription="editingSubscription" :active="show" />
 
