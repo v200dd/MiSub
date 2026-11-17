@@ -50,7 +50,7 @@ jobs:
           git fetch --prune origin main
           git fetch --prune upstream main
 
-      - name: Mirror upstream main
+      - name: Merge upstream main and preserve custom changes
         env:
           SYNC_PAT: ${{ secrets.SYNC_PAT }}
         run: |
@@ -72,7 +72,7 @@ jobs:
             fi
           fi
 
-          echo "🚀 正在镜像上游 main，fork 本地 main 上的额外提交会被丢弃。"
-          git reset --hard upstream/main
-          git push --force-with-lease origin main
-          echo "✅ Fork main 已镜像到上游 main。"
+          echo "🚀 正在合并上游 main，保留 fork 的自定义提交。"
+          git merge upstream/main --no-edit
+          git push origin main
+          echo "✅ 已合并上游更新并保留自定义修改。"

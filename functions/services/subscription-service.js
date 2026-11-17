@@ -16,6 +16,7 @@ import {
     isLocalProxyEndpoint,
 } from '../utils/node-utils.js';
 import { runOperatorChain } from '../utils/operator-runner.js';
+import { applySubscriptionNodeRenames } from '../utils/subscription-node-renames.js';
 import { createTimeoutFetch } from '../modules/utils.js';
 import { assertPublicNetworkUrl } from '../modules/security-utils.js';
 import { isSuspiciousNodeCountDrop } from './node-cache-service.js';
@@ -765,7 +766,7 @@ export async function generateCombinedNodeList(
         const readCachedNodes = async () => {
             if (!cacheEnabled) return [];
             const cached = await readSubscriptionNodeCache(storage, sub);
-            return cached?.nodes || [];
+            return applySubscriptionNodeRenames(cached?.nodes || [], sub.nodeRenames);
         };
         const readCacheEntry = async () => {
             if (!cacheEnabled) return null;
@@ -827,12 +828,14 @@ export async function generateCombinedNodeList(
             text = await decodeBase64Content(text);
 
             // 使用统一的 node-parser 解析，确保与预览一致的过滤规则 (UUID校验, Hysteria1过滤, SS加密校验等)
-            const parsedObjects = parseNodeList(text);
+            const parsedObjects = parseNodeList(text, { plusAsSpace: Boolean(sub.plusAsSpace) });
 
             let fallbackParsedObjects = parsedObjects;
             if (parsedObjects.length === 0) {
                 const fallbackText = await decodeBase64Content(encodeArrayBufferToBase64(buffer));
-                const fallbackNodes = parseNodeList(fallbackText);
+                const fallbackNodes = parseNodeList(fallbackText, {
+                    plusAsSpace: Boolean(sub.plusAsSpace),
+                });
                 if (fallbackNodes.length > 0) {
                     fallbackParsedObjects = fallbackNodes;
                 }
@@ -869,7 +872,10 @@ export async function generateCombinedNodeList(
             if (cacheEnabled && realNodes.length === 0) {
                 // 过滤条件变化后命中 0 节点是配置的预期结果，不能回退旧配置的缓存节点
                 const cached = await readCacheEntry();
-                if (!hasFilterConfigChanged(cached)) return (cached?.nodes || []).join('\n');
+                if (!hasFilterConfigChanged(cached))
+                    return applySubscriptionNodeRenames(cached?.nodes || [], sub.nodeRenames).join(
+                        '\n'
+                    );
             } else if (cacheEnabled) {
                 const cached = await readCacheEntry();
                 if (
@@ -879,7 +885,7 @@ export async function generateCombinedNodeList(
                     console.warn(
                         `[SubscriptionCache] Refusing suspicious node-count drop for ${sub.id || sub.url} (${cached.nodes.length} -> ${realNodes.length})`
                     );
-                    return cached.nodes.join('\n');
+                    return applySubscriptionNodeRenames(cached.nodes, sub.nodeRenames).join('\n');
                 }
             }
             if (!cacheEnabled && realNodes.length === 0) {
@@ -910,6 +916,8 @@ export async function generateCombinedNodeList(
             }
 
             // 判断是否启用订阅前缀（智能重命名启用时跳过）
+            // Keep protective caches before aliases so edits/removals also work during outages.
+            validNodes = applySubscriptionNodeRenames(validNodes, sub.nodeRenames);
             const shouldPrependSubscriptions = profilePrefixSettings?.enableSubscriptions ?? true;
             const shouldAddSubPrefix = shouldPrependSubscriptions && !skipPrefixDueToRenaming;
 

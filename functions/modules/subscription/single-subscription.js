@@ -106,19 +106,23 @@ export async function handleDirectUrlMode(
     subscriptionUrl,
     userAgent,
     skipCertVerify = false,
-    plusAsSpace = false
+    plusAsSpace = false,
+    options = {}
 ) {
     const debug = subscriptionUrl.includes('b0b422857bb46aba65da8234c84f38c6');
     const result = await fetchSubscriptionNodes(
         subscriptionUrl,
         '预览订阅',
         userAgent,
-        null,
+        options.customUserAgent,
         debug,
-        '',
-        null,
+        options.exclude || '',
+        options.fetchProxy,
         skipCertVerify,
-        plusAsSpace
+        plusAsSpace,
+        false,
+        null,
+        { operators: options.operators, nodeTransform: options.nodeTransform }
     );
 
     return {

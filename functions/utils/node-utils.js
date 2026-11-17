@@ -91,6 +91,10 @@ function updateSsrRemarks(link, updater) {
     }
 }
 
+export function setSsrNodeName(link, name) {
+    return name ? updateSsrRemarks(link, () => name) : link;
+}
+
 /**
  * 为节点名称添加前缀
  */

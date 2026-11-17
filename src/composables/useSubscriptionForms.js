@@ -17,6 +17,8 @@ export function useSubscriptionForms({ addSubscription, updateSubscription }) {
             name: '',
             url: '',
             enabled: true,
+            operators: [],
+            nodeRenames: [],
             exclude: '',
             customUserAgent: '',
             fetchProxy: '',

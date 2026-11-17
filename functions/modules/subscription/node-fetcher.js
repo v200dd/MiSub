@@ -1,6 +1,8 @@
 import { parseNodeList } from '../utils/node-parser.js';
 import { fetchWithRetry } from '../../services/fetch-utils.js';
 import { buildFetchProxyUrl } from '../../utils/fetch-proxy-utils.js';
+import { runOperatorChain } from '../../utils/operator-runner.js';
+import { applySubscriptionNodeRenames } from '../../utils/subscription-node-renames.js';
 import {
     readSubscriptionNodeCache,
     buildSubscriptionFilterFingerprint,
@@ -69,7 +71,7 @@ export async function fetchSubscriptionNodes(
                 subscriptionName,
                 url,
                 success: true,
-                nodes: parsedNodes,
+                nodes: applySubscriptionNodeRenames(parsedNodes, subscription.nodeRenames),
                 error: upstreamError,
                 fromCache: true,
                 cacheUpdatedAt: cached.updatedAt || null,
@@ -135,6 +137,25 @@ export async function fetchSubscriptionNodes(
             }
         }
 
+        // Match the output pipeline: source operators, source filters, then literal aliases.
+        let operators = subscription?.operators;
+        if (!Array.isArray(operators) || operators.length === 0) {
+            operators = subscription?.nodeTransform?.enabled
+                ? subscription.nodeTransform.operators
+                : [];
+        }
+        if (Array.isArray(operators) && operators.length > 0) {
+            const urls = await runOperatorChain(
+                parsedNodes.map((node) => node.url),
+                operators,
+                {
+                    subName: subscriptionName,
+                    userAgent,
+                }
+            );
+            parsedNodes = parseNodeList(urls.join('\n'), { plusAsSpace });
+        }
+
         if (excludeRules && excludeRules.trim()) {
             parsedNodes = applyExcludeRulesToNodes(parsedNodes, excludeRules);
         }
@@ -150,7 +171,7 @@ export async function fetchSubscriptionNodes(
             subscriptionName,
             url,
             success: true,
-            nodes: parsedNodes,
+            nodes: applySubscriptionNodeRenames(parsedNodes, subscription?.nodeRenames),
             error: null,
         };
     } catch (e) {

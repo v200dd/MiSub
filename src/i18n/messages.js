@@ -313,6 +313,23 @@ export const messages = {
             searchLabel: '搜索节点',
         },
         subscriptions: {
+            lineRenameTitle: '逐条重命名线路',
+            lineRenameCount: '{count} 条已改名',
+            lineRenameHint:
+                '加载线路后填写新名称，也可手动添加。按原名称精确匹配，同名线路一起更改；清空新名称或移除即可恢复原名。规则仅作用于当前订阅，订阅更新后继续生效。后续订阅组的命名规则仍会继续处理。',
+            loadLineNames: '加载线路名称',
+            loadingNodes: '正在加载线路…',
+            addLineRename: '+ 手动添加',
+            searchLineNames: '搜索原名称或新名称',
+            originalLineName: '原线路名称',
+            customLineName: '新线路名称',
+            keepOriginalLineName: '留空保留原名',
+            removeLineRename: '移除改名规则',
+            noLineNames: '订阅没有可用线路，可手动添加改名规则。',
+            lineRenameEmpty: '点击“加载线路名称”选择要改名的线路，或手动填写原名称和新名称。',
+            nodeRenameTitle: '线路名称处理',
+            nodeRenameHint:
+                '只作用于当前订阅。添加“正则命名”规则即可批量替换线路名，例如查找 tg、替换为 Telegram。',
             proxyPlaceholder: '例如: https://my-proxy.vercel.app/api?url=',
             excludePlaceholder:
                 '[排除模式(默认)]\nproto:vless,trojan\n(过期|官网)\n---\n[包含模式(只保留匹配项)]\nkeep:(香港|HK)\nkeep:proto:ss',
@@ -2169,6 +2186,24 @@ export const messages = {
             searchLabel: 'Search nodes',
         },
         subscriptions: {
+            lineRenameTitle: 'Rename individual lines',
+            lineRenameCount: '{count} renamed',
+            lineRenameHint:
+                'Load lines and enter new names, or add a rule manually. Names are matched exactly; lines with the same name are renamed together. Clear the new name or remove a rule to restore the original. Rules apply only to this source and persist across updates. Profile naming rules run afterwards.',
+            loadLineNames: 'Load line names',
+            loadingNodes: 'Loading lines…',
+            addLineRename: '+ Add manually',
+            searchLineNames: 'Search original or new names',
+            originalLineName: 'Original line name',
+            customLineName: 'New line name',
+            keepOriginalLineName: 'Leave blank to keep the original',
+            removeLineRename: 'Remove rename rule',
+            noLineNames: 'No usable lines. You can still add a rename rule manually.',
+            lineRenameEmpty:
+                'Load line names to choose lines to rename, or enter an original and new name manually.',
+            nodeRenameTitle: 'Node name processing',
+            nodeRenameHint:
+                'Applies only to this subscription. Add a “Regex rename” rule to replace names in bulk, such as finding tg and replacing it with Telegram.',
             proxyPlaceholder: 'e.g. https://my-proxy.vercel.app/api?url=',
             excludePlaceholder:
                 '[Exclude mode (default)]\nproto:vless,trojan\n(expired|official)\n---\n[Include mode (keep matches only)]\nkeep:(HK)\nkeep:proto:ss',

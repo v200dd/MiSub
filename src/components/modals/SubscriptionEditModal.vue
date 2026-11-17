@@ -1,4 +1,5 @@
 <script setup>
+    import OperatorChain from '../features/Operators/OperatorChain.vue';
     import { computed, ref, watch } from 'vue';
     import { useToastStore } from '../../stores/toast.js';
     import { useI18n } from '../../i18n/index.js';
@@ -6,6 +7,7 @@
     import EditForm from './SubscriptionEditModal/EditForm.vue';
     import RuleSection from './SubscriptionEditModal/RuleSection.vue';
     import AdvancedOptions from './SubscriptionEditModal/AdvancedOptions.vue';
+    import NodeRenameSection from './SubscriptionEditModal/NodeRenameSection.vue';
     const props = defineProps({
         show: Boolean,
         isNew: Boolean,
@@ -451,6 +453,26 @@
         <template #body>
             <div class="space-y-4">
                 <EditForm :editing-subscription="editingSubscription" />
+
+                <NodeRenameSection :editing-subscription="editingSubscription" :active="show" />
+
+                <details
+                    :open="
+                        Array.isArray(editingSubscription.operators) &&
+                        editingSubscription.operators.length > 0
+                    "
+                    class="space-y-2 border-t border-gray-100 pt-4 dark:border-gray-700"
+                >
+                    <summary
+                        class="cursor-pointer text-sm font-semibold text-gray-800 dark:text-gray-200"
+                    >
+                        {{ t('subscriptions.nodeRenameTitle') }}
+                    </summary>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {{ t('subscriptions.nodeRenameHint') }}
+                    </p>
+                    <OperatorChain v-model="editingSubscription.operators" />
+                </details>
 
                 <RuleSection
                     :editing-subscription="editingSubscription"
